@@ -2,4 +2,4 @@
 
 ## Requirements
 
-[![Go 1.8+](https://img.shields.io/badge/Go?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
+[![Go 1.8+](https://img.shields.io/badge/go_1.8+)](https://go.dev/)

@@ -1,21 +1,16 @@
 package main
 
 import (
-	t "bd-bot/dist"
-	"fmt"
 	"log"
-
-	"github.com/joho/godotenv"
 )
 
+var EnvConfig *Config
+
 func main() {
-	fmt.Println("Starting bot...")
+	log.Println("Starting bot...")
 
-	err := godotenv.Load()
+	EnvConfig = LoadConfig()
 
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	t.TelegramBot()
+	ConnectDB()
+	TelegramBot()
 }

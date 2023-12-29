@@ -16,14 +16,16 @@ TODO
 
 ```
 .
-├── dist                        # Application
 ├── .env                        # environment variables
 ├── .env.example                # environment variables examples
 ├── .gitignore                  #
-├── CHANGELOG.md                # 
+├── CHANGELOG.md                #
+├── config.go                   # ENV config
+├── database.go                 # Database worker
 ├── main.go                     # application start point
 ├── Makefile                    # Commands list
-└── README.md                   #
+├── README.md                   #
+└── telegram.go                 # telegram bot
 ```
 
 ## Installation

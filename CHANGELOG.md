@@ -11,3 +11,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Created project
 - Added connection to Postgres DB
+- Added user's birthday command realization

@@ -22,10 +22,12 @@ TODO
 ├── CHANGELOG.md                #
 ├── config.go                   # ENV config
 ├── database.go                 # Database worker
+├── discts.go                   # Dictionaries, types and constants
 ├── main.go                     # application start point
 ├── Makefile                    # Commands list
 ├── README.md                   #
-└── telegram.go                 # telegram bot
+├── telegram.go                 # telegram bot
+└── user.go                     # User methods
 ```
 
 ## Installation

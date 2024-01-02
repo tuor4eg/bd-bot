@@ -11,6 +11,6 @@ func main() {
 
 	EnvConfig = LoadConfig()
 
-	ConnectDB()
+	InitDb()
 	TelegramBot()
 }

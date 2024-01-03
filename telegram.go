@@ -60,7 +60,7 @@ func TelegramBot() {
 
 	for update := range updates {
 		if update.CallbackQuery != nil {
-			callbacks(update)
+			go callbacks(update)
 		} else if update.Message.IsCommand() {
 			go commands(update)
 		} else {
@@ -82,27 +82,9 @@ func commands(update tgbotapi.Update) {
 
 	switch command {
 	case Commands.Start:
-		msg = "Nice to see you again!"
-
-		user := CheckUser(chatID)
-
-		if user == nil {
-			user = CreateUser(&UserParams{TelegramID: chatID})
-
-			msg = "Welcome to Birthday bot. Nice to meet you."
-		}
-
-		log.Printf("Bot added to chat with ID: %d\n", chatID)
+		msg = commandStart(chatID)
 	case Commands.Birthday:
-		msg = "Enter your birthday date"
-
-		user, _ := GetUserBirthday(chatID)
-
-		if user != nil {
-			msg = fmt.Sprintf("Your birthday date is %s. Enter new date if you want to change it.", user.Birthday.Format("02-01-2006"))
-		}
-
-		SetState(chatID, Commands.Birthday, Statuses.Pending)
+		msg = commandBirthday(chatID)
 	default:
 		msg = "This is test version. Nice to meet you"
 	}
@@ -112,19 +94,67 @@ func commands(update tgbotapi.Update) {
 
 func messages(update tgbotapi.Update) {
 	var msg string
+	var state State
+	var err error
 
 	chatID := update.Message.From.ID
 
-	state, err := GetState(chatID)
+	state, err = GetState(chatID)
 
 	if err == nil {
 		switch state.Command {
 		case Commands.Birthday:
-			msg = SetUserBirthday(chatID, update.Message.Text)
-
-			ClearState(chatID)
+			msg = messageBirthday(chatID, update.Message.Text)
 		}
+	} else {
+		msg = Errors.INTERNAL_ERROR
 	}
 
 	sendMessage(chatID, msg)
+}
+
+/**
+* Commands
+ */
+
+func commandStart(chatID int64) string {
+	var user *User
+
+	msg := "Nice to see you again!"
+
+	user, _ = CheckUser(chatID)
+
+	if user == nil {
+		user = CreateUser(&UserParams{TelegramID: chatID})
+
+		msg = "Welcome to Birthday bot. Nice to meet you."
+	}
+
+	return msg
+}
+
+func commandBirthday(chatID int64) string {
+	msg := "Enter your birthday date"
+
+	user, _ := GetUserBirthday(chatID)
+
+	if user != nil {
+		msg = fmt.Sprintf("Your birthday date is %s. Enter new date if you want to change it.", user.Birthday.Format("02-01-2006"))
+	}
+
+	SetState(chatID, Commands.Birthday, Statuses.Pending)
+
+	return msg
+}
+
+/**
+* Messages
+ */
+
+func messageBirthday(chatID int64, date string) string {
+	msg := SetUserBirthday(chatID, date)
+
+	ClearState(chatID)
+
+	return msg
 }

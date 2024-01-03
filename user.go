@@ -24,16 +24,20 @@ type UserParams struct {
 	DataCompleted *bool
 }
 
-func CheckUser(telegramID int64) *User {
+func CheckUser(telegramID int64) (*User, error) {
 	var dbUser User
 
 	result := Db.Where(User{TelegramID: telegramID}).First(&dbUser)
 
-	if result.RowsAffected == 0 {
-		return nil
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
-	return &dbUser
+	if result.RowsAffected == 0 {
+		return nil, nil
+	}
+
+	return &dbUser, nil
 }
 
 func CreateUser(userParams *UserParams) *User {
@@ -65,14 +69,14 @@ func GetUserBirthday(telegramID int64) (*User, error) {
 func UpdateUserBirthday(telegramID int64, birthday time.Time) (*User, error) {
 	var dbUser User
 
-	//result := Db.Where(User{TelegramID: telegramID}).First(&dbUser)
+	result := Db.Model(&dbUser).Where(User{TelegramID: telegramID})
 
 	updateData := map[string]interface{}{
 		"Birthday":      birthday,
 		"DataCompleted": true,
 	}
 
-	result := Db.Model(&dbUser).Where(User{TelegramID: telegramID}).Updates(updateData)
+	result = result.Updates(updateData)
 
 	if result.Error != nil {
 		return nil, result.Error

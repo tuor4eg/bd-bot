@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
+	dp "github.com/araddon/dateparse"
 	"gorm.io/gorm"
 )
 
@@ -77,4 +79,19 @@ func UpdateUserBirthday(telegramID int64, birthday time.Time) (*User, error) {
 	}
 
 	return &dbUser, nil
+}
+
+func SetUserBirthday(chatID int64, date string) string {
+	var msg string
+
+	birthday, dateErr := dp.ParseAny(date)
+	_, updErr := UpdateUserBirthday(chatID, birthday)
+
+	if dateErr == nil && updErr == nil {
+		msg = fmt.Sprintf("Your birthday date is %s", birthday.Format("02-01-2006"))
+	} else {
+		msg = Errors.INTERNAL_ERROR
+	}
+
+	return msg
 }

@@ -1,16 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"reflect"
 
-	dp "github.com/araddon/dateparse"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
-
-var UserState = make(map[int64]State)
 
 var tgBot *tgbotapi.BotAPI
 
@@ -106,7 +102,7 @@ func commands(update tgbotapi.Update) {
 			msg = fmt.Sprintf("Your birthday date is %s. Enter new date if you want to change it.", user.Birthday.Format("02-01-2006"))
 		}
 
-		setUserState(chatID, Commands.Birthday, Statuses.Pending)
+		SetState(chatID, Commands.Birthday, Statuses.Pending)
 	default:
 		msg = "This is test version. Nice to meet you"
 	}
@@ -119,56 +115,16 @@ func messages(update tgbotapi.Update) {
 
 	chatID := update.Message.From.ID
 
-	state, err := getUserState(chatID)
+	state, err := GetState(chatID)
 
 	if err == nil {
 		switch state.Command {
 		case Commands.Birthday:
-			msg = setUserBirthday(chatID, update.Message.Text)
+			msg = SetUserBirthday(chatID, update.Message.Text)
 
-			clearUserState(chatID)
+			ClearState(chatID)
 		}
 	}
 
 	sendMessage(chatID, msg)
-}
-
-func clearUserState(chatID int64) {
-	delete(UserState, chatID)
-}
-
-func getUserState(chatID int64) (State, error) {
-	status, stateOk := UserState[chatID]
-
-	if !stateOk {
-		return State{}, errors.New(Errors.NO_USER_STATE)
-	}
-
-	return status, nil
-}
-
-func setUserState(chatID int64, command string, status int) {
-	_, userOk := UserState[chatID]
-
-	if !userOk {
-		UserState[chatID] = State{
-			Command: command,
-			Status:  status,
-		}
-	}
-}
-
-func setUserBirthday(chatID int64, date string) string {
-	var msg string
-
-	birthday, dateErr := dp.ParseAny(date)
-	_, updErr := UpdateUserBirthday(chatID, birthday)
-
-	if dateErr == nil && updErr == nil {
-		msg = fmt.Sprintf("Your birthday date is %s", birthday.Format("02-01-2006"))
-	} else {
-		msg = Errors.INTERNAL_ERROR
-	}
-
-	return msg
 }

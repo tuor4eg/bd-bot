@@ -14,11 +14,6 @@ type Error struct {
 	INTERNAL_ERROR string
 }
 
-type State struct {
-	Command string
-	Status  int
-}
-
 var Statuses = Status{
 	Pending: 0,
 }
